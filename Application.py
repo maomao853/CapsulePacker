@@ -16,9 +16,34 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import tuple_factory
 
+from multiprocessing.pool import ThreadPool
+
 import sys
 import re
 import json
+
+# Thread Class
+class WorkerThread(QThread):
+    
+    finished = Signal(object)
+
+    def __init__(self, fn, *args, **kwargs):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+    @Slot()
+    def run(self):
+        try:
+            result = self.fn(
+                *self.args, **self.kwargs
+            )
+        except Exception as e:
+            print(e)
+        else:
+            self.finished.emit(result)
+
 
 ## Add Patient WINDOW ##
 class Ui_AddPatient(QWidget):
@@ -333,28 +358,24 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
 
         # Medication Lookup
-        rows, meds = self.getMeds()
-        model = QStandardItemModel(len(meds), 3)
-        model.setHorizontalHeaderLabels([
+        self.model = QStandardItemModel(0, 3)
+        self.model.setHorizontalHeaderLabels([
             "DIN",
             "Medication",
             "Strength",
         ])
-        for row, value in enumerate(meds):
-            for column, item in enumerate(value):
-                model.setItem(row, column, QStandardItem(str(item)))
             
-        filter_proxy_model = QSortFilterProxyModel()
-        filter_proxy_model.setSourceModel(model)
-        filter_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        filter_proxy_model.setFilterKeyColumn(1)
+        self.filter_proxy_model = QSortFilterProxyModel()
+        self.filter_proxy_model.setSourceModel(self.model)
+        self.filter_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.filter_proxy_model.setFilterKeyColumn(1)
 
         self.tableView = QTableView(self.frame_3)
         self.tableView.setObjectName(u"tableView")
         self.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableView.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tableView.setModel(filter_proxy_model)
+        self.tableView.setModel(self.filter_proxy_model)
         self.gridLayout_3.addWidget(self.tableView, 1, 0, 1, 5)
         self.tableView.setColumnWidth(0, 70)
         self.tableView.setColumnWidth(1, 200)
@@ -363,7 +384,7 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit = QLineEdit(self.frame_3)
         self.lineEdit.setObjectName(u"lineEdit")
         self.lineEdit.setMinimumSize(QSize(400, 40))
-        self.lineEdit.textChanged.connect(filter_proxy_model.setFilterRegExp)
+        self.lineEdit.textChanged.connect(self.filter_proxy_model.setFilterRegExp)
         self.gridLayout_3.addWidget(self.lineEdit, 0, 0, 1, 5)
 
         self.pushButton_6 = QPushButton(self.frame_3)
@@ -389,13 +410,14 @@ class Ui_MainWindow(QMainWindow):
         QMetaObject.connectSlotsByName(self)
 
         # STARTUP EVENTS
-        self.loadPatientDropdown()
-        self.loadPatientTable()
+        self.initMedTable()
+        self.initPatientDropdown()
+        #self.loadPatientTable()
 
 
 ## BUTTON EVENTS ##
         # Dropdown Menu
-        self.comboBox.currentIndexChanged.connect(self.loadPatientTable)
+        self.comboBox.currentIndexChanged.connect(self.initPatientTable)
         # Med_lookup BUTTON
         self.pushButton.clicked.connect(self.buttonEvent_1)
         #self.pushButton_4.clicked.connect()
@@ -443,7 +465,7 @@ class Ui_MainWindow(QMainWindow):
         query = "delete from patient where pid={} if exists".format(pid)
         print(query)
         self.executeData(query)
-        self.loadPatientDropdown()
+        self.initPatientDropdown()
 
     # delete med
     def buttonEvent_6(self):
@@ -456,45 +478,66 @@ class Ui_MainWindow(QMainWindow):
 
             query = "delete prescriptions[{}] from patient where pid={}".format(row, pid)
             self.executeData(query)
-            self.loadPatientTable()
+            self.initPatientTable()
         elif (row < 0):
             pass
         
 
 ## Custom Functions ##
-    # Initialize Medication Lookup
-    def getMeds(self):
+    # Initialize Medication Table
+    def initMedTable(self):
         query = "select * from medication"
-        meds = self.getAllData(query)
-       
-        counter = 0
+        self.worker = WorkerThread(self.getAllData, query)
+        self.worker.finished.connect(self.updateMedTable)
+        self.worker.start()
+
+    # Update Medication Table
+    def updateMedTable(self, meds):
+        print("UPDATE")
         medList = []
         for item in meds:
             medList.append(item)
-            counter += 1
 
-        return(counter, medList)
+        self.model = QStandardItemModel(len(medList), 3)
+        for row, value in enumerate(medList):
+            for column, item in enumerate(value):
+                self.model.setItem(row, column, QStandardItem(str(item)))
+        
+        self.model.setHorizontalHeaderLabels([
+            "DIN",
+            "Medication",
+            "Strength",
+        ])
+        self.filter_proxy_model.setSourceModel(self.model)
+        self.tableView.setModel(self.filter_proxy_model)
 
     # Initialize patient data
-    def loadPatientDropdown(self):
+    def initPatientDropdown(self):
+        query = "select * from patient"
+        self.worker = WorkerThread(self.getAllData, query)
+        self.worker.finished.connect(self.updatePatientDropdown)
+        self.worker.start()
+
+    def updatePatientDropdown(self, data):
         self.comboBox.clear()
         self.pidCache = []
-        query = "select * from patient"
-        data = self.getAllData(query)
         for item in data:
             name = "{}, {}".format(item[1], item[2])
             self.pidCache.append(item[0])
             self.comboBox.addItem(name)
-
-    def loadPatientTable(self):
+        
+    def initPatientTable(self):
         self.tableWidget.setRowCount(0)
         index = self.comboBox.currentIndex()
         pid_temp = self.pidCache
         pid = pid_temp[index]
 
         query = "select prescriptions from patient where pid={}".format(pid)
-        data = self.getSingleData(query)
-        print(data)
+        self.worker = WorkerThread(self.getSingleData, query)
+        self.worker.finished.connect(self.updatePatientTable)
+        self.worker.start()
+
+    def updatePatientTable(self, data):
         try:
             for i, item in enumerate(data[0]):
                 print(item)
@@ -535,7 +578,7 @@ class Ui_MainWindow(QMainWindow):
 
         query = "update patient set prescriptions = prescriptions + {} where pid = {}".format(medList, pid)
         self.executeData(query)
-        self.loadPatientTable()
+        self.initPatientTable()
 
     # Add Patient
     @Slot(str, str)
@@ -547,6 +590,26 @@ class Ui_MainWindow(QMainWindow):
 
 
 ## DATABASE FUNCTIONS ##
+
+    # Get all data from database
+    def getMedTableData(self, query):
+        cloud_config= {
+            'secure_connect_bundle': 'secure-connect-pharmacydb.zip',
+            'use_default_tempdir': True
+        }
+        auth_provider = PlainTextAuthProvider('maomao853', 'admin')
+        cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+        session = cluster.connect()
+        session.row_factory = tuple_factory
+        session.execute('use pharmacy_db')
+
+        data = session.execute(query)
+        x = [i for i in data]
+        print(query)
+        print(data)
+        print(x)
+        return(data)
+
     # Get all data from database
     def getAllData(self, query):
         cloud_config= {
@@ -560,6 +623,7 @@ class Ui_MainWindow(QMainWindow):
         session.execute('use pharmacy_db')
 
         data = session.execute(query)
+        print(query)
         return(data)
     
     # Get one line of data from database
