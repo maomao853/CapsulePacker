@@ -44,11 +44,9 @@ class WorkerThread(QThread):
         else:
             self.finished.emit(result)
 
+class Ui_DeleteWindow(QWidget):
 
-## Add Patient WINDOW ##
-class Ui_AddPatient(QWidget):
-
-    submitted = Signal(str, str)
+    accepted = Signal()
 
     def __init__(self):
         super().__init__()
@@ -56,17 +54,19 @@ class Ui_AddPatient(QWidget):
         self.show()
 
     def setupUi(self):
-        self.resize(400, 305)
-        self.setMinimumSize(QSize(400, 305))
-        self.setMaximumSize(QSize(400, 305))
+        self.resize(400, 340)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setStyleSheet(u"background-color: rgb(250, 251, 254);")
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalSpacer = QSpacerItem(20, 30, QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.verticalLayout.addItem(self.verticalSpacer)
-
         self.frame = QFrame(self)
         self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(90, 50))
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setStyleSheet(u"background-color: rgb(239, 241, 248);\nborder-radius: 5px;")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.formLayout = QFormLayout(self.frame)
@@ -74,33 +74,20 @@ class Ui_AddPatient(QWidget):
 
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
-        self.label.setMinimumSize(QSize(90, 50))
-        self.label.setStyleSheet(u"font: 25 16pt \"Segoe UI Light\";")
-        self.label.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
-
-        self.lineEdit_2 = QLineEdit(self.frame)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
-        self.lineEdit_2.setMinimumSize(QSize(200, 35))
-        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.lineEdit_2)
-
-        self.lineEdit = QLineEdit(self.frame)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setMinimumSize(QSize(200, 35))
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.lineEdit)
-
-        self.label_2 = QLabel(self.frame)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setMinimumSize(QSize(90, 50))
-        self.label_2.setStyleSheet(u"font: 25 16pt \"Segoe UI Light\";")
-        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
-        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_2)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setMinimumSize(QSize(0, 210))
+        self.label.setStyleSheet(u"font: 12 24pt \"JetBrains Mono ExtraLight\";")
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setText("Are you sure you \nwant to delete:\n")
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.label)
 
         self.verticalLayout.addWidget(self.frame)
 
         self.frame_2 = QFrame(self)
         self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setMinimumSize(QSize(0, 100))
+        self.frame_2.setMinimumSize(QSize(0, 80))
+        self.frame_2.setStyleSheet(u"background-color: rgb(62, 74, 89);border-radius: 3px;")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_2)
@@ -109,18 +96,180 @@ class Ui_AddPatient(QWidget):
         self.pushButton = QPushButton(self.frame_2)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setMinimumSize(QSize(0, 50))
-        self.pushButton.setStyleSheet(u"font: 14pt \"Segoe UI Light\";")
+        self.pushButton.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
         self.horizontalLayout.addWidget(self.pushButton)
 
         self.pushButton_2 = QPushButton(self.frame_2)
         self.pushButton_2.setObjectName(u"pushButton_2")
         self.pushButton_2.setMinimumSize(QSize(0, 50))
-        self.pushButton_2.setStyleSheet(u"font: 14pt \"Segoe UI Light\";")
+        self.pushButton_2.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton_2:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton_2:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
         self.horizontalLayout.addWidget(self.pushButton_2)
 
-        QWidget.setTabOrder(self.lineEdit, self.lineEdit_2)
-        QWidget.setTabOrder(self.lineEdit_2, self.pushButton)
-        QWidget.setTabOrder(self.pushButton, self.pushButton_2)
+        self.verticalLayout.addWidget(self.frame_2)
+        self.retranslateUi()
+        QMetaObject.connectSlotsByName(self)
+
+## Button Events ##
+        self.pushButton.clicked.connect(self.yes)
+        self.pushButton_2.clicked.connect(self.no)
+
+    def retranslateUi(self):
+        self.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+        self.pushButton.setText(QCoreApplication.translate("Form", u"Yes", None))
+        self.pushButton_2.setText(QCoreApplication.translate("Form", u"No", None))
+
+## Custom Functions ##
+    def yes(self):
+        self.accepted.emit()
+        self.close()
+    
+    def no(self):
+        self.close()
+
+## Add Patient WINDOW ##
+class Ui_AddPatient(QWidget):
+
+    submitted = Signal(str, str)
+
+    def __init__(self):
+        super().__init__()
+        self.lineEditQSS = ("""
+        font: 25 14pt "JetBrains Mono Light";
+        background-color: rgb(220, 221, 252);
+        padding: 5px;
+        """)
+
+        self.setupUi()
+        self.show()
+
+    def setupUi(self):
+        self.resize(400, 340)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setStyleSheet(u"background-color: rgb(250, 251, 254);")
+        self.verticalLayout = QVBoxLayout(self)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.frame = QFrame(self)
+        self.frame.setObjectName(u"frame")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setStyleSheet(u"background-color: rgb(239, 241, 248);border-radius: 5px;")
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frame)
+        self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setLabelAlignment(Qt.AlignCenter)
+        self.formLayout.setFormAlignment(Qt.AlignCenter)
+
+        self.label = QLabel(self.frame)
+        self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"font: 20pt \"JetBrains Mono Extra Bold\";color: rgb(112, 0, 168);")
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
+
+        self.label_2 = QLabel(self.frame)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setStyleSheet(u"font: 20pt \"JetBrains Mono Extra Bold\";color: rgb(112, 0, 168);")
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_2)
+
+        self.lineEdit = QLineEdit(self.frame)
+        self.lineEdit.setObjectName(u"lineEdit_2")
+        self.lineEdit.setMinimumSize(QSize(0, 40))
+        self.lineEdit.setStyleSheet(self.lineEditQSS)
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.lineEdit)
+
+        self.lineEdit_2 = QLineEdit(self.frame)
+        self.lineEdit_2.setObjectName(u"lineEdit")
+        self.lineEdit_2.setStyleSheet(self.lineEditQSS)
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.lineEdit_2)
+
+        self.verticalLayout.addWidget(self.frame)
+
+        self.frame_2 = QFrame(self)
+        self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setMinimumSize(QSize(0, 80))
+        self.frame_2.setStyleSheet(u"background-color: rgb(62, 74, 89);border-radius: 3px;")
+        self.frame_2.setFrameShape(QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout = QHBoxLayout(self.frame_2)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+
+        self.pushButton = QPushButton(self.frame_2)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setMinimumSize(QSize(0, 50))
+        self.pushButton.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
+        self.horizontalLayout.addWidget(self.pushButton)
+
+        self.pushButton_2 = QPushButton(self.frame_2)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setMinimumSize(QSize(0, 50))
+        self.pushButton_2.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton_2:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton_2:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
+        self.horizontalLayout.addWidget(self.pushButton_2)
 
         self.verticalLayout.addWidget(self.frame_2)
         self.retranslateUi()
@@ -136,8 +285,6 @@ class Ui_AddPatient(QWidget):
         self.label_2.setText(QCoreApplication.translate("Form", u"Last Name", None))
         self.pushButton.setText(QCoreApplication.translate("Form", u"Add Patient", None))
         self.pushButton_2.setText(QCoreApplication.translate("Form", u"Discard", None))
-        self.lineEdit.setPlaceholderText(QCoreApplication.translate("Form", u"First Name...", None))
-        self.lineEdit_2.setPlaceholderText(QCoreApplication.translate("Form", u"Last Name...", None))
 
 ## CUSTOM FUNCTIONS ##
     # Button Functions
@@ -157,6 +304,15 @@ class Ui_AddMedication(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.spinBoxQSS = """
+        font: 20pt "Segoe UI";
+        background-color: rgb(220, 221, 252);font: 20pt "Segoe UI";
+        """
+        self.labelQSS = """
+        font: 20pt "JetBrains Mono Extra Bold";
+        color: rgb(112, 0, 168);
+        """
+
         self.setupUi()
         self.show()
 
@@ -164,77 +320,123 @@ class Ui_AddMedication(QWidget):
         self.resize(400, 300)
         self.setMaximumSize(400, 300)
         self.setMinimumSize(400, 300)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setStyleSheet("background-color: rgb(250, 251, 254);")
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.frame = QFrame(self)
         self.frame.setObjectName(u"frame")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
+        self.frame.setStyleSheet("background-color: rgb(239, 241, 248);border-radius: 5px;")
         self.formLayout = QFormLayout(self.frame)
         self.formLayout.setObjectName(u"formLayout")
 
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
         self.label.setMinimumSize(QSize(200, 50))
-        self.label.setStyleSheet(u"font: 20pt \"Segoe UI\";")
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
-
-        self.spinBox = QSpinBox(self.frame)
-        self.spinBox.setObjectName(u"spinBox")
-        self.spinBox.setMinimumSize(QSize(0, 50))
-        self.spinBox.setStyleSheet(u"font: 20pt \"Segoe UI\";")
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.spinBox)
+        self.label.setAlignment(Qt.AlignHCenter)
+        self.label.setStyleSheet(self.labelQSS)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)    
 
         self.label_2 = QLabel(self.frame)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(200, 50))
-        self.label_2.setStyleSheet(u"font: 20pt \"Segoe UI\";")
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_2)
-
-        self.spinBox_2 = QSpinBox(self.frame)
-        self.spinBox_2.setObjectName(u"spinBox_2")
-        self.spinBox_2.setMinimumSize(QSize(0, 50))
-        self.spinBox_2.setStyleSheet(u"font: 20pt \"Segoe UI\";")
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spinBox_2)
+        self.label_2.setAlignment(Qt.AlignHCenter)
+        self.label_2.setStyleSheet(self.labelQSS)
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_2)    
 
         self.label_3 = QLabel(self.frame)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setMinimumSize(QSize(200, 50))
-        self.label_3.setStyleSheet(u"font: 20pt \"Segoe UI\";")
+        self.label_3.setAlignment(Qt.AlignHCenter)
+        self.label_3.setStyleSheet(self.labelQSS)
         self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_3)
 
         self.label_4 = QLabel(self.frame)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setMinimumSize(QSize(200, 50))
-        self.label_4.setStyleSheet(u"font: 20pt \"Segoe UI\";")
+        self.label_4.setAlignment(Qt.AlignHCenter)
+        self.label_4.setStyleSheet(self.labelQSS)
         self.formLayout.setWidget(3, QFormLayout.LabelRole, self.label_4)
+
+        self.spinBox = QSpinBox(self.frame)
+        self.spinBox.setObjectName(u"spinBox")
+        self.spinBox.setMinimumSize(QSize(0, 40))
+        self.spinBox.setStyleSheet(self.spinBoxQSS)
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.spinBox)
+
+        self.spinBox_2 = QSpinBox(self.frame)
+        self.spinBox_2.setObjectName(u"spinBox_2")
+        self.spinBox_2.setMinimumSize(QSize(0, 40))
+        self.spinBox_2.setStyleSheet(self.spinBoxQSS)
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spinBox_2)
 
         self.spinBox_3 = QSpinBox(self.frame)
         self.spinBox_3.setObjectName(u"spinBox_3")
-        self.spinBox_3.setMinimumSize(QSize(0, 50))
-        self.spinBox_3.setStyleSheet(u"font: 20pt \"Segoe UI\";")
+        self.spinBox_3.setMinimumSize(QSize(0, 40))
+        self.spinBox_3.setStyleSheet(self.spinBoxQSS)
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.spinBox_3)
 
         self.spinBox_4 = QSpinBox(self.frame)
         self.spinBox_4.setObjectName(u"spinBox_4")
-        self.spinBox_4.setMinimumSize(QSize(0, 50))
-        self.spinBox_4.setStyleSheet(u"font: 20pt \"Segoe UI\";")
+        self.spinBox_4.setMinimumSize(QSize(0, 40))
+        self.spinBox_4.setStyleSheet(self.spinBoxQSS)
         self.formLayout.setWidget(3, QFormLayout.FieldRole, self.spinBox_4)
 
         self.verticalLayout.addWidget(self.frame)
 
         self.frame_2 = QFrame(self)
         self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setMinimumSize(QSize(0, 80))
+        self.frame_2.setStyleSheet("background-color: rgb(62, 74, 89);border-radius: 3px;")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_2)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        
         self.pushButton = QPushButton(self.frame_2)
         self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setMinimumSize(QSize(0, 50))
+        self.pushButton.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
         self.horizontalLayout.addWidget(self.pushButton)
 
         self.pushButton_2 = QPushButton(self.frame_2)
         self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setMinimumSize(QSize(0, 50))
+        self.pushButton_2.setStyleSheet("""
+        QPushButton {
+			color: rgb(255, 255, 255);
+            background-color: rgb(117, 122, 242);
+			border-radius: 3px;
+			font: 12pt "JetBrains Mono Extra Bold";
+        }
+        QPushButton#pushButton_2:hover {
+            background-color: rgb(82, 86, 238);
+			border-radius: 3px;
+        }
+        QPushButton#pushButton_2:pressed {
+            background-color: rgb(82, 86, 238);
+			border: 3px solid rgbrgb(214, 203, 255);
+			border-radius: 3px;
+        }
+        """)
         self.horizontalLayout.addWidget(self.pushButton_2)
 
         self.verticalLayout.addWidget(self.frame_2)
@@ -602,13 +804,13 @@ class Ui_MainWindow(QMainWindow):
 
         self.pushButton = QPushButton(self.frame_3)
         self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setMinimumSize(QSize(200, 50))
+        self.pushButton.setMinimumSize(QSize(200, 40))
         self.pushButton.setStyleSheet("""
         QPushButton {
 			color: rgb(255, 255, 255);
             background-color: rgb(117, 122, 242);
 			border-radius: 3px;
-            font: 28pt "Segoe UI Semibold";
+            font: 26pt "Segoe UI Semibold";
         }
         QPushButton#pushButton:hover {
             background-color: rgb(82, 86, 238);
@@ -663,6 +865,8 @@ class Ui_MainWindow(QMainWindow):
 ## Button Functions ##
     # add med
     def buttonEvent_1(self):
+        x = self.tableView.currentIndex()
+        print(x)
         self.addMedWindow = Ui_AddMedication()
         self.addMedWindow.addEdit(False)
         self.addMedWindow.show()
@@ -671,11 +875,19 @@ class Ui_MainWindow(QMainWindow):
     # add patient
     def buttonEvent_2(self):
         self.addPatientWindow = Ui_AddPatient()
-        self.addPatientWindow.addEdit
         self.addPatientWindow.submitted.connect(self.addPatient)
 
     # delete patient
     def buttonEvent_3(self):
+        name = self.comboBox.currentText()
+        self.deleteWindow = Ui_DeleteWindow()
+        text = self.deleteWindow.label.text()
+        newText = text + name
+        self.deleteWindow.label.setText(newText)
+        self.deleteWindow.accepted.connect(self.buttonUpdate_3)
+        self.deleteWindow.show()
+        
+    def buttonUpdate_3(self):
         index = self.comboBox.currentIndex()
         pid_temp = self.pidCache
         pid = pid_temp[index]
@@ -707,6 +919,17 @@ class Ui_MainWindow(QMainWindow):
 
     # delete med
     def buttonEvent_6(self):
+        row = self.tableWidget.currentRow()
+        name = self.tableWidget.item(row, 1).text()
+        strength = self.tableWidget.item(row, 2).text()
+        self.deleteWindow = Ui_DeleteWindow()
+        text = self.deleteWindow.label.text()
+        newText = text + name + " " + strength
+        self.deleteWindow.label.setText(newText)
+        self.deleteWindow.accepted.connect(self.buttonUpdate_6)
+        self.deleteWindow.show()
+
+    def buttonUpdate_6(self):
         row = self.tableWidget.currentRow()
 
         if (row >= 0):
@@ -804,6 +1027,7 @@ class Ui_MainWindow(QMainWindow):
     # Add Selected Medication
     @Slot(bool, str, str, str, str)
     def addMedication(self, isEdit, morning, noon, evening, bedtime):
+        print(isEdit)
         if isEdit:
             row = self.tableWidget.currentRow()
             din = self.tableView.model().index(row, 0).data()
@@ -829,6 +1053,7 @@ class Ui_MainWindow(QMainWindow):
             medList.append(medInfo)
 
             query = "update patient set prescriptions = prescriptions + {} where pid = {}".format(medList, pid)
+            print(query)
             self.executeData(query)
             self.initPatientTable()
 
